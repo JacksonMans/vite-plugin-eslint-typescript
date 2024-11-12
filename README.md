@@ -21,9 +21,9 @@ import { defineConfig } from 'vite';
 import eslintOverlay from '@mawns/vite-plugin-eslint';
 
 export default defineConfig({
-  ...,
+  ...
   plugins: [
-    ...,
+    ...
     eslintOverlay()
   ]
 });
@@ -31,7 +31,7 @@ export default defineConfig({
 
 ## Options
 
-You can pass options to the plugin in prder to customize some of its behaviour
+You can pass an options object to the plugin in order to customize some of its behaviour
 
 ### useCache
 
