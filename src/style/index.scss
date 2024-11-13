@@ -6,10 +6,14 @@
   height: 100%;
   background-color: transparent;
   z-index: 1000;
-  display: flex;
   justify-content: center;
   align-items: center;
   background-color: rgba(70, 70, 70, 0.5);
+  display: none;
+
+  .active {
+    display: flex;
+  }
 
   #mawns_eslint-overlay-inner {
     display: block;

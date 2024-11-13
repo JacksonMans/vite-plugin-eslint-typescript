@@ -5,6 +5,7 @@ export default defineConfig((options) => ({
   entry: ['src/index.ts', 'src/style/index.scss'],
   format: ['cjs', 'esm'], // Build for commonJS and ESmodules
   outDir: 'dist',
+  experimentalDts: false,
   dts: true, // Generate declaration file (.d.ts)
   sourcemap: false,
   clean: true,
@@ -13,7 +14,7 @@ export default defineConfig((options) => ({
   target: ['es2020', 'node18'],
   esbuildPlugins: [
     sassPlugin({
-      type: 'css',
+      type: 'css-text',
     }),
   ],
 }));
