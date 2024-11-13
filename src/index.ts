@@ -1,21 +1,21 @@
-import { ESLint, Linter } from "eslint";
-import { PluginOption } from "vite";
-import { ViteEslintPluginOptions } from "./types";
-import { defaultOptions } from "./constants";
+import { ESLint, Linter } from 'eslint';
+import { PluginOption } from 'vite';
+import { ViteEslintPluginOptions } from './types';
+import { defaultOptions } from './constants';
 
 const formatEslintForHmrOverlay = (lintResults: ESLint.LintResult[]) => {
   const formatMessage = (message: Linter.LintMessage) =>
     `${message.line}:${message.column}  ${
-      message.severity === 1 ? "Warning" : "Error"
+      message.severity === 1 ? 'Warning' : 'Error'
     }  ${message.message}  ${message.ruleId}`;
 
   const formatLintResult = (result: ESLint.LintResult) =>
-    `${result.filePath}\n  ${result.messages.map(formatMessage).join("\n")}`;
+    `${result.filePath}\n  ${result.messages.map(formatMessage).join('\n')}`;
 
   return lintResults
     .filter((el) => el.messages.length)
     .map(formatLintResult)
-    .join("\n");
+    .join('\n');
 };
 
 const viteEslintPlugin = (
@@ -33,17 +33,57 @@ const viteEslintPlugin = (
   let prevTimeStamp = 0;
 
   return {
-    name: "@mans/vite-plugin-eslint",
+    name: '@mans/vite-plugin-eslint',
+    transformIndexHtml: {
+      order: 'pre',
+      handler: () => [
+        {
+          tag: 'div',
+          attrs: {
+            id: 'mawns_eslint-overlay-outer',
+          },
+          injectTo: 'body',
+          children: [
+            {
+              tag: 'div',
+              attrs: {
+                id: 'mawns_eslint-overlay-inner',
+              },
+              children: [
+                {
+                  tag: 'div',
+                  attrs: {
+                    class: 'header',
+                  },
+                },
+                {
+                  tag: 'div',
+                  attrs: {
+                    class: 'content',
+                  },
+                },
+                {
+                  tag: 'div',
+                  attrs: {
+                    class: 'footer',
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
     handleHotUpdate: async (ctx) => {
       if (ctx.timestamp - prevTimeStamp < 1000) {
         return;
       }
       prevTimeStamp = ctx.timestamp;
 
-      const eslintResults = await linter.lintFiles("*/**/*");
+      const eslintResults = await linter.lintFiles('*/**/*');
 
       if (useConsole) {
-        const formatter = await linter.loadFormatter("stylish");
+        const formatter = await linter.loadFormatter('stylish');
         const consoleFormat = await formatter.format(eslintResults);
         if (consoleFormat) {
           console.log(consoleFormat);
@@ -54,10 +94,10 @@ const viteEslintPlugin = (
         const textFormat = formatEslintForHmrOverlay(eslintResults);
         if (textFormat) {
           ctx.server.ws.send({
-            type: "error",
+            type: 'error',
             err: {
               message: textFormat,
-              stack: "",
+              stack: '',
             },
           });
           return [];
