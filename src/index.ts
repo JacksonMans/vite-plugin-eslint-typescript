@@ -6,6 +6,16 @@ import {
   formatEslintForCustomOverlay,
 } from 'formatters';
 import { ViteEslintPluginOptions, OverlayIds, OverlayClassNames } from 'types';
+import fs from 'fs';
+
+const script = fs.readFileSync(
+  './node_modules/@mawns/vite-plugin-eslint/dist/script/index.mjs',
+  'utf-8'
+);
+const styles = fs.readFileSync(
+  './node_modules/@mawns/vite-plugin-eslint/dist/style/index.css',
+  'utf-8'
+);
 
 const viteEslintPlugin = (
   userOptions?: ViteEslintPluginOptions
@@ -33,22 +43,20 @@ const viteEslintPlugin = (
       order: 'pre',
       handler: () => [
         {
-          tag: 'link',
+          tag: 'style',
           attrs: {
-            rel: 'stylesheet',
-            href: 'https://cdn.jsdelivr.net/npm/@mawns/vite-plugin-eslint@latest/dist/style/index.css',
+            type: 'text/css',
           },
           injectTo: 'head',
+          children: styles,
         },
         {
           tag: 'script',
           attrs: {
-            async: true,
-            defer: true,
             type: 'module',
-            src: 'https://cdn.jsdelivr.net/npm/@mawns/vite-plugin-eslint@latest/dist/script/index.mjs',
           },
-          injectTo: 'body',
+          injectTo: 'head',
+          children: script,
         },
         {
           tag: 'div',

@@ -1,6 +1,6 @@
 {
   "name": "@mawns/vite-plugin-eslint",
-  "version": "1.0.11",
+  "version": "1.0.14",
   "description": "vite plugin for eslint",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -19,7 +19,6 @@
     "start": "tsup --watch",
     "test": "jest",
     "build": "tsup",
-    "build:scss": "tsup src/style/index.scss & copy dist\\index.mjs src\\style\\index.mjs",
     "lint": "eslint ./src --ext .js,.ts",
     "pub": "npm run build & npm publish"
   },

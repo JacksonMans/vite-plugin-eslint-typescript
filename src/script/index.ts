@@ -1,19 +1,33 @@
 window.onload = () => {
-  if (import.meta.hot)
-    import.meta.hot.on('lint', (o) => {
-      const outer = document.querySelector('#mawns_eslint-overlay-outer');
-      if (!outer) return;
-      const content = outer.querySelector('.content');
-      if (!content) return;
-      content.innerHTML = o;
-      if (o) {
-        outer.setAttribute('style', 'display: flex;');
+  const attempt = (retry = 1) => {
+    if (import.meta.hot) {
+      console.log(`Connected to websockets successfully`);
+      import.meta.hot.on('lint', (o) => {
+        const outer = document.querySelector('#mawns_eslint-overlay-outer');
+        if (!outer) return;
+        const content = outer.querySelector('.content');
+        if (!content) return;
+        content.innerHTML = o;
+        if (o) {
+          outer.setAttribute('style', 'display: flex;');
+        } else {
+          outer.setAttribute('style', 'display: none;');
+        }
+      });
+    } else {
+      if (retry <= 10) {
+        console.log(`connection failed, retrying in ${retry} second(s)`);
+        setTimeout(() => {
+          attempt(retry + 1);
+        }, 1000 * retry);
       } else {
-        outer.setAttribute('style', 'display: none;');
+        console.error(
+          'Failed to load ESLint overlay. import.meta.hot is not available.'
+        );
       }
-    });
-  else
-    throw new Error(
-      'import.meta.hot is not defined but is required for vite-plugin-eslint to work.'
-    );
+    }
+  };
+
+  console.log('attempting to connect to vite websockets');
+  attempt();
 };
