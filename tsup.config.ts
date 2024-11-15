@@ -2,8 +2,8 @@ import { defineConfig } from 'tsup';
 import { sassPlugin } from 'esbuild-sass-plugin';
 
 export default defineConfig((options) => ({
-  entry: ['src/index.ts'],
-  format: ['cjs', 'esm'], // Build for commonJS and ESmodules
+  entry: ['src/index.ts', 'src/script/index.ts', 'src/style/index.scss'],
+  format: ['esm'], // Build for commonJS and ESmodules
   outDir: 'dist',
   experimentalDts: false,
   dts: true, // Generate declaration file (.d.ts)
@@ -15,7 +15,7 @@ export default defineConfig((options) => ({
   target: ['es2020', 'node18'],
   esbuildPlugins: [
     sassPlugin({
-      type: 'css-text',
+      type: 'css',
     }),
   ],
 }));

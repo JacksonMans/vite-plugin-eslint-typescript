@@ -1,28 +1,22 @@
-import { ESLint, Linter } from 'eslint';
+import { ESLint } from 'eslint';
 import { PluginOption } from 'vite';
-import { ViteEslintPluginOptions } from './types';
 import { defaultOptions } from './constants';
-import styles from './style';
-
-const formatEslintForHmrOverlay = (lintResults: ESLint.LintResult[]) => {
-  const formatMessage = (message: Linter.LintMessage) =>
-    `${message.line}:${message.column}  ${
-      message.severity === 1 ? 'Warning' : 'Error'
-    }  ${message.message}  ${message.ruleId}`;
-
-  const formatLintResult = (result: ESLint.LintResult) =>
-    `${result.filePath}\n  ${result.messages.map(formatMessage).join('\n')}`;
-
-  return lintResults
-    .filter((el) => el.messages.length)
-    .map(formatLintResult)
-    .join('\n');
-};
+import {
+  formatEslintForHmrOverlay,
+  formatEslintForCustomOverlay,
+} from 'formatters';
+import { ViteEslintPluginOptions, OverlayIds, OverlayClassNames } from 'types';
 
 const viteEslintPlugin = (
   userOptions?: ViteEslintPluginOptions
 ): PluginOption => {
-  const { useCache, useConsole, useHmrOverlay, showWarnings } = {
+  const {
+    useCache,
+    useConsole,
+    useHmrOverlay,
+    showWarnings,
+    useCustomOverlay,
+  } = {
     ...defaultOptions,
     ...userOptions,
   };
@@ -39,39 +33,52 @@ const viteEslintPlugin = (
       order: 'pre',
       handler: () => [
         {
-          tag: 'style',
-          attrs: { type: 'text/css' },
-          children: styles,
+          tag: 'link',
+          attrs: {
+            rel: 'stylesheet',
+            href: 'https://cdn.jsdelivr.net/npm/@mawns/vite-plugin-eslint@latest/dist/style/index.css',
+          },
+          injectTo: 'head',
+        },
+        {
+          tag: 'script',
+          attrs: {
+            async: true,
+            defer: true,
+            type: 'module',
+            src: 'https://cdn.jsdelivr.net/npm/@mawns/vite-plugin-eslint@latest/dist/script/index.mjs',
+          },
+          injectTo: 'body',
         },
         {
           tag: 'div',
           attrs: {
-            id: 'mawns_eslint-overlay-outer',
+            id: OverlayIds.outer,
           },
           injectTo: 'body',
           children: [
             {
               tag: 'div',
               attrs: {
-                id: 'mawns_eslint-overlay-inner',
+                id: OverlayIds.inner,
               },
               children: [
                 {
                   tag: 'div',
                   attrs: {
-                    class: 'header',
+                    class: OverlayClassNames.header,
                   },
                 },
                 {
                   tag: 'div',
                   attrs: {
-                    class: 'content',
+                    class: OverlayClassNames.content,
                   },
                 },
                 {
                   tag: 'div',
                   attrs: {
-                    class: 'footer',
+                    class: OverlayClassNames.footer,
                   },
                 },
               ],
@@ -107,9 +114,17 @@ const viteEslintPlugin = (
             },
           });
           return [];
-        } else {
-          return;
         }
+        return;
+      }
+      if (useCustomOverlay) {
+        const customFormat = formatEslintForCustomOverlay(eslintResults);
+        ctx.server.ws.send({
+          type: 'custom',
+          event: 'lint',
+          data: customFormat,
+        });
+        return [];
       }
       return;
     },
