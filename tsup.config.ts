@@ -2,7 +2,7 @@ import { defineConfig } from 'tsup';
 import { sassPlugin } from 'esbuild-sass-plugin';
 
 export default defineConfig((options) => ({
-  entry: ['src/index.ts', 'src/style/index.scss'],
+  entry: ['src/index.ts'],
   format: ['cjs', 'esm'], // Build for commonJS and ESmodules
   outDir: 'dist',
   experimentalDts: false,
@@ -10,6 +10,7 @@ export default defineConfig((options) => ({
   sourcemap: false,
   clean: true,
   tsconfig: './tsconfig.json',
+  splitting: false,
   minify: !options.watch,
   target: ['es2020', 'node18'],
   esbuildPlugins: [

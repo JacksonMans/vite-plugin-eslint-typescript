@@ -18,7 +18,8 @@
   "scripts": {
     "start": "tsup --watch",
     "test": "jest",
-    "build": "tsup",
+    "build": "npm run build:scss & tsup",
+    "build:scss": "tsup src/style/index.scss & copy dist\\index.js src\\style\\index.js",
     "lint": "eslint ./src --ext .js,.ts",
     "pub": "npm run build & npm publish"
   },
