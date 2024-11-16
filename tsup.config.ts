@@ -1,8 +1,9 @@
 import { defineConfig } from 'tsup';
 import { sassPlugin } from 'esbuild-sass-plugin';
+import inlineImportPlugin from 'esbuild-plugin-inline-import';
 
 export default defineConfig((options) => ({
-  entry: ['src/index.ts', 'src/script/index.ts', 'src/style/index.scss'],
+  entry: ['src/index.ts'],
   format: ['esm'], // Build for commonJS and ESmodules
   outDir: 'dist',
   experimentalDts: false,
@@ -14,6 +15,7 @@ export default defineConfig((options) => ({
   minify: !options.watch,
   target: ['es2020', 'node18'],
   esbuildPlugins: [
+    inlineImportPlugin(),
     sassPlugin({
       type: 'css',
     }),

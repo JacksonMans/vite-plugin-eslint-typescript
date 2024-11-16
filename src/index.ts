@@ -5,17 +5,9 @@ import {
   formatEslintForHmrOverlay,
   formatEslintForCustomOverlay,
 } from 'formatters';
-import { ViteEslintPluginOptions, OverlayIds, OverlayClassNames } from 'types';
-import fs from 'fs';
-
-const script = fs.readFileSync(
-  './node_modules/@mawns/vite-plugin-eslint/dist/script/index.mjs',
-  'utf-8'
-);
-const styles = fs.readFileSync(
-  './node_modules/@mawns/vite-plugin-eslint/dist/style/index.css',
-  'utf-8'
-);
+import { ViteEslintPluginOptions } from 'types';
+//@ts-ignore
+import script from 'inline:./script/index.mjs';
 
 const viteEslintPlugin = (
   userOptions?: ViteEslintPluginOptions
@@ -42,14 +34,14 @@ const viteEslintPlugin = (
     transformIndexHtml: {
       order: 'pre',
       handler: () => [
-        {
-          tag: 'style',
-          attrs: {
-            type: 'text/css',
-          },
-          injectTo: 'head',
-          children: styles,
-        },
+        // {
+        //   tag: 'style',
+        //   attrs: {
+        //     type: 'text/css',
+        //   },
+        //   injectTo: 'head',
+        //   children: styles,
+        // },
         {
           tag: 'script',
           attrs: {
@@ -58,41 +50,41 @@ const viteEslintPlugin = (
           injectTo: 'head',
           children: script,
         },
-        {
-          tag: 'div',
-          attrs: {
-            id: OverlayIds.outer,
-          },
-          injectTo: 'body',
-          children: [
-            {
-              tag: 'div',
-              attrs: {
-                id: OverlayIds.inner,
-              },
-              children: [
-                {
-                  tag: 'div',
-                  attrs: {
-                    class: OverlayClassNames.header,
-                  },
-                },
-                {
-                  tag: 'div',
-                  attrs: {
-                    class: OverlayClassNames.content,
-                  },
-                },
-                {
-                  tag: 'div',
-                  attrs: {
-                    class: OverlayClassNames.footer,
-                  },
-                },
-              ],
-            },
-          ],
-        },
+        // {
+        //   tag: 'div',
+        //   attrs: {
+        //     id: OverlayIds.outer,
+        //   },
+        //   injectTo: 'body',
+        //   children: [
+        //     {
+        //       tag: 'div',
+        //       attrs: {
+        //         id: OverlayIds.inner,
+        //       },
+        //       children: [
+        //         {
+        //           tag: 'div',
+        //           attrs: {
+        //             class: OverlayClassNames.header,
+        //           },
+        //         },
+        //         {
+        //           tag: 'div',
+        //           attrs: {
+        //             class: OverlayClassNames.content,
+        //           },
+        //         },
+        //         {
+        //           tag: 'div',
+        //           attrs: {
+        //             class: OverlayClassNames.footer,
+        //           },
+        //         },
+        //       ],
+        //     },
+        //   ],
+        // },
       ],
     },
     handleHotUpdate: async (ctx) => {

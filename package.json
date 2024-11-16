@@ -18,7 +18,9 @@
   "scripts": {
     "start": "tsup --watch",
     "test": "jest",
-    "build": "tsup",
+    "build": "npm run build:sass & npm run build:script & tsup",
+    "build:sass": "tsup src/style/index.scss & copy dist\\index.css src\\style\\index.css",
+    "build:script": "tsup src/script/index.ts & copy dist\\index.mjs src\\script\\index.mjs",
     "lint": "eslint ./src --ext .js,.ts",
     "pub": "npm run build & npm publish"
   },
@@ -32,13 +34,12 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.5.14",
+    "esbuild-plugin-inline-import": "^1.1.0",
     "esbuild-sass-plugin": "^3.3.1",
     "jest": "^29.7.0",
-    "lit-element": "^4.1.1",
     "release-please": "^16.14.3",
     "ts-jest": "^29.2.5",
-    "tsup": "^8.1.0",
-    "typed-scss-modules": "^8.0.1"
+    "tsup": "^8.3.5"
   },
   "peerDependencies": {
     "eslint": "^9.14.0",
