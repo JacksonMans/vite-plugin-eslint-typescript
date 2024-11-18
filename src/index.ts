@@ -34,14 +34,6 @@ const viteEslintPlugin = (
     transformIndexHtml: {
       order: 'pre',
       handler: () => [
-        // {
-        //   tag: 'style',
-        //   attrs: {
-        //     type: 'text/css',
-        //   },
-        //   injectTo: 'head',
-        //   children: styles,
-        // },
         {
           tag: 'script',
           attrs: {
@@ -50,41 +42,6 @@ const viteEslintPlugin = (
           injectTo: 'head',
           children: script,
         },
-        // {
-        //   tag: 'div',
-        //   attrs: {
-        //     id: OverlayIds.outer,
-        //   },
-        //   injectTo: 'body',
-        //   children: [
-        //     {
-        //       tag: 'div',
-        //       attrs: {
-        //         id: OverlayIds.inner,
-        //       },
-        //       children: [
-        //         {
-        //           tag: 'div',
-        //           attrs: {
-        //             class: OverlayClassNames.header,
-        //           },
-        //         },
-        //         {
-        //           tag: 'div',
-        //           attrs: {
-        //             class: OverlayClassNames.content,
-        //           },
-        //         },
-        //         {
-        //           tag: 'div',
-        //           attrs: {
-        //             class: OverlayClassNames.footer,
-        //           },
-        //         },
-        //       ],
-        //     },
-        //   ],
-        // },
       ],
     },
     handleHotUpdate: async (ctx) => {
@@ -119,12 +76,14 @@ const viteEslintPlugin = (
       }
       if (useCustomOverlay) {
         const customFormat = formatEslintForCustomOverlay(eslintResults);
-        ctx.server.ws.send({
-          type: 'custom',
-          event: 'lint',
-          data: customFormat,
-        });
-        return [];
+        if (customFormat) {
+          ctx.server.ws.send({
+            type: 'custom',
+            event: 'lint',
+            data: customFormat,
+          });
+          return [];
+        }
       }
       return;
     },
