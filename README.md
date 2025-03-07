@@ -1,7 +1,7 @@
 # @mawns/vite-plugin-eslint
 
 ![Static Badge](https://img.shields.io/badge/ESLint-9.x.x-blue)
-![Static Badge](https://img.shields.io/badge/Vite-5.x.x-blue)
+![Static Badge](https://img.shields.io/badge/Vite-6.x.x-blue)
 ![Static Badge](https://img.shields.io/badge/License-MIT-green)
 
 Plugin to show ESLint output in vite HMR overlay
