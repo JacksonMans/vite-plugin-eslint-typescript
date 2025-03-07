@@ -31,6 +31,7 @@ export enum OverlayClassNames {
   content = 'content',
   footer = 'footer',
   message = 'message',
+  messageText = 'message-text',
   error = 'severity-error',
   warning = 'severity-warning',
   lineDetails = 'line-details',

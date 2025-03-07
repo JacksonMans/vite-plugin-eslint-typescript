@@ -26,9 +26,12 @@ export const formatEslintForCustomOverlay = (
       message.severity === 1
         ? OverlayClassNames.warning
         : OverlayClassNames.error
-    }">${message.severity === 1 ? 'Warning' : 'Error'} </span>${
+    }">${message.severity === 1 ? 'Warning' : 'Error'} </span>
+    <span class="${OverlayClassNames.messageText}">${
       message.message
-    }  <span class="${OverlayClassNames.ruleId}">${message.ruleId}</span></p>`;
+    }</span>  <span class="${OverlayClassNames.ruleId}">${
+      message.ruleId
+    }</span></p>`;
 
   const formatLintResult = (result: ESLint.LintResult) =>
     `<div class="${OverlayClassNames.lintResult}"><p class="${
