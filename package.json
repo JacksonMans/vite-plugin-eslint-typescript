@@ -1,6 +1,6 @@
 {
   "name": "@mawns/vite-plugin-eslint",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "vite plugin for eslint",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
