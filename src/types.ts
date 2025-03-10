@@ -13,11 +13,6 @@ export interface ViteEslintPluginOptions {
    *
    * default: false
    */
-  useHmrOverlay?: boolean;
-  /** Whether or not the plugin should send results to the plugins Custom overlay
-   *
-   * default: true
-   */
   useCustomOverlay?: boolean;
   /** Whether or not the plugin should inclide warnings in the output
    *

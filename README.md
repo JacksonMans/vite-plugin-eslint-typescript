@@ -4,7 +4,7 @@
 ![Static Badge](https://img.shields.io/badge/Vite-6.x.x-blue)
 ![Static Badge](https://img.shields.io/badge/License-MIT-green)
 
-Plugin to show ESLint output in vite HMR overlay
+Plugin to show ESLint output in custom HMR overlay
 
 ## Install
 
@@ -29,6 +29,8 @@ export default defineConfig({
 });
 ```
 
+#### This plugin uses configuration from an existing ESLint flat config file and ESLint should be set up in your project beforehand.
+
 ## Options
 
 You can pass an options object to the plugin in order to customize some of its behaviour
@@ -47,12 +49,12 @@ Cache previous eslint results to speed up process.
 
 Print output to the console.
 
-### useHmrOverlay
+### useCustomOverlay
 
 - Type: `boolean`
 - Default: `true`
 
-Print output to the HMR overlay.
+Print output to the custom HMR overlay.
 
 ### showWarnings
 

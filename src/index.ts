@@ -1,10 +1,7 @@
 import { ESLint } from 'eslint';
 import { PluginOption } from 'vite';
 import { defaultOptions } from './constants';
-import {
-  formatEslintForHmrOverlay,
-  formatEslintForCustomOverlay,
-} from 'formatters';
+import { formatEslintForCustomOverlay } from 'formatters';
 import { ViteEslintPluginOptions } from 'types';
 //@ts-ignore
 import script from 'inline:./script/index.mjs';
@@ -12,13 +9,7 @@ import script from 'inline:./script/index.mjs';
 const viteEslintPlugin = (
   userOptions?: ViteEslintPluginOptions
 ): PluginOption => {
-  const {
-    useCache,
-    useConsole,
-    useHmrOverlay,
-    showWarnings,
-    useCustomOverlay,
-  } = {
+  const { useCache, useConsole, showWarnings, useCustomOverlay } = {
     ...defaultOptions,
     ...userOptions,
   };
@@ -44,6 +35,31 @@ const viteEslintPlugin = (
         },
       ],
     },
+    configureServer: async (server) => {
+      server.hot.on('vite-plugin-eslint:connected', async () => {
+        console.log('vite-plugin-eslint:connected');
+
+        const eslintResults = await linter.lintFiles('*/**/*');
+
+        if (useConsole) {
+          const formatter = await linter.loadFormatter('stylish');
+          const consoleFormat = await formatter.format(eslintResults);
+          if (consoleFormat) {
+            console.log(consoleFormat);
+          }
+        }
+
+        if (useCustomOverlay) {
+          const customFormat = formatEslintForCustomOverlay(eslintResults);
+
+          server.ws.send({
+            type: 'custom',
+            event: 'lint',
+            data: customFormat,
+          });
+        }
+      });
+    },
 
     handleHotUpdate: async (ctx) => {
       if (ctx.timestamp - prevTimeStamp < 1000) {
@@ -58,19 +74,6 @@ const viteEslintPlugin = (
         const consoleFormat = await formatter.format(eslintResults);
         if (consoleFormat) {
           console.log(consoleFormat);
-        }
-      }
-
-      if (useHmrOverlay) {
-        const textFormat = formatEslintForHmrOverlay(eslintResults);
-        if (textFormat) {
-          ctx.server.ws.send({
-            type: 'error',
-            err: {
-              message: textFormat,
-              stack: '',
-            },
-          });
         }
       }
 

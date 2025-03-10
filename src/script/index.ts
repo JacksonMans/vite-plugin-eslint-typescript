@@ -44,6 +44,7 @@ window.onload = () => {
           outer.setAttribute('style', 'display: none;');
         }
       });
+      import.meta.hot.send('vite-plugin-eslint:connected');
     } else {
       if (retry <= 10) {
         console.log(`ws connection failed, retrying in ${retry} second(s)`);
