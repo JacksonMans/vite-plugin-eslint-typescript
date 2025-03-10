@@ -37,8 +37,6 @@ const viteEslintPlugin = (
     },
     configureServer: async (server) => {
       server.hot.on('vite-plugin-eslint:connected', async () => {
-        console.log('vite-plugin-eslint:connected');
-
         const eslintResults = await linter.lintFiles('*/**/*');
 
         if (useConsole) {
