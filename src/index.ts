@@ -44,6 +44,7 @@ const viteEslintPlugin = (
         },
       ],
     },
+
     handleHotUpdate: async (ctx) => {
       if (ctx.timestamp - prevTimeStamp < 1000) {
         return;
@@ -70,22 +71,20 @@ const viteEslintPlugin = (
               stack: '',
             },
           });
-          return [];
         }
-        return;
       }
+
       if (useCustomOverlay) {
         const customFormat = formatEslintForCustomOverlay(eslintResults);
-        if (customFormat) {
-          ctx.server.ws.send({
-            type: 'custom',
-            event: 'lint',
-            data: customFormat,
-          });
-          return [];
-        }
+
+        ctx.server.ws.send({
+          type: 'custom',
+          event: 'lint',
+          data: customFormat,
+        });
       }
-      return;
+
+      return [];
     },
   };
 };

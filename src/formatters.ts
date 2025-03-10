@@ -45,3 +45,19 @@ export const formatEslintForCustomOverlay = (
     .map(formatLintResult)
     .join(' ');
 };
+
+export const getEslintErrorSummary = (lintResults: ESLint.LintResult[]) => {
+  const { errors, warnings } = lintResults.reduce(
+    (acc, curr) => {
+      if (!acc) return { errors: 0, warnings: 0 };
+      return {
+        errors:
+          acc.errors + curr.messages.filter((el) => el.severity === 2).length,
+        warnings:
+          acc.warnings + curr.messages.filter((el) => el.severity === 1).length,
+      };
+    },
+    { errors: 0, warnings: 0 }
+  );
+  return { errors, warnings };
+};

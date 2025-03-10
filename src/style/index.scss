@@ -64,14 +64,19 @@
     .header {
       background-color: rgba(8, 8, 8, 0.5);
       height: 3rem;
-      color: rgb(179, 59, 59);
+      color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
       padding: 1rem 0;
-      &::before {
-        content: 'ESLint run resulted in errors and/or warnings!';
+
+      .severity-warning {
+        color: rgb(216, 183, 36);
+      }
+
+      .severity-error {
+        color: rgb(179, 59, 59);
       }
     }
 
