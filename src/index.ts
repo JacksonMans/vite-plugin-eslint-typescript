@@ -84,8 +84,6 @@ const viteEslintPlugin = (
           data: customFormat,
         });
       }
-
-      return [];
     },
   };
 };

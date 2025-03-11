@@ -13,15 +13,12 @@ window.onload = () => {
   const inner = document.createElement('div');
   const header = document.createElement('div');
   const content = document.createElement('div');
-  // const footer = document.createElement('div');
   outer.setAttribute('id', 'mawns_eslint-overlay-outer');
   inner.setAttribute('id', 'mawns_eslint-overlay-inner');
   header.setAttribute('class', 'header');
   content.setAttribute('class', 'content');
-  // footer.setAttribute('class', 'footer');
   inner.appendChild(header);
   inner.appendChild(content);
-  // inner.appendChild(footer);
   outer.appendChild(inner);
 
   const styles = document.createElement('style');
