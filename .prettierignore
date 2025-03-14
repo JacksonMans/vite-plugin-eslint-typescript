@@ -12,7 +12,6 @@ package.json
 .gitattributes
 .gitignore
 .prettierignore
-.eslintrc
 NuGet.Config
 yarn.lock
 README.md
@@ -20,3 +19,4 @@ README.md
 /public
 coverage-ts
 /stories/*
+.eslintcache

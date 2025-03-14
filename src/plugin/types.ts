@@ -1,4 +1,4 @@
-export interface ViteEslintPluginOptions {
+export interface ViteTypescriptEslintPluginOptions {
   /** Whether or not to use eslints caching option
    *
    * default: true
@@ -35,7 +35,15 @@ export enum OverlayClassNames {
   lintResult = 'lint-result',
 }
 
-export enum OverlayIds {
-  outer = 'mawns_eslint-overlay-outer',
-  inner = 'mawns_eslint-overlay-inner',
+export enum OverlayAssets {
+  style = '/@mawns/vite-plugin-eslint/style.css',
+  script = '/@mawns/vite-plugin-eslint/script',
+  badgeError = '/@mawns/vite-plugin-eslint/badge-error.svg',
+  badgeWarning = '/@mawns/vite-plugin-eslint/badge-warning.svg',
+}
+
+export enum OverlayEvents {
+  connected = '@mawns/vite-plugin-eslint:connected',
+  lint = '@mawns/vite-plugin-eslint:lint',
+  styleUpdate = '@mawns/vite-plugin-eslint:style-update',
 }

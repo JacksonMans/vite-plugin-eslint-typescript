@@ -1,5 +1,5 @@
 import { ESLint, Linter } from 'eslint';
-import { OverlayClassNames } from 'types';
+import { OverlayClassNames } from './types';
 
 export const formatEslintForHmrOverlay = (lintResults: ESLint.LintResult[]) => {
   const formatMessage = (message: Linter.LintMessage) =>
@@ -17,7 +17,7 @@ export const formatEslintForHmrOverlay = (lintResults: ESLint.LintResult[]) => {
 };
 
 export const formatEslintForCustomOverlay = (
-  lintResults: ESLint.LintResult[]
+  lintResults: ESLint.LintResult[],
 ) => {
   const formatMessage = (message: Linter.LintMessage) =>
     `<p class="${OverlayClassNames.message}"><span class="${
@@ -57,7 +57,7 @@ export const getEslintErrorSummary = (lintResults: ESLint.LintResult[]) => {
           acc.warnings + curr.messages.filter((el) => el.severity === 1).length,
       };
     },
-    { errors: 0, warnings: 0 }
+    { errors: 0, warnings: 0 },
   );
   return { errors, warnings };
 };

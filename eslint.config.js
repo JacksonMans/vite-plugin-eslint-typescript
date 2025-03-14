@@ -1,81 +1,58 @@
-import globals from "globals";
-import reactHooks from "eslint-plugin-react-hooks";
-import reactRefresh from "eslint-plugin-react-refresh";
-import tseslint from "typescript-eslint";
-import eslintConfigPrettier from "eslint-config-prettier";
-import eslintConfigReact from "eslint-plugin-react";
+import js from '@eslint/js';
+import unusedImports from 'eslint-plugin-unused-imports';
+import tseslint from 'typescript-eslint';
+import tseslintparser from '@typescript-eslint/parser';
+import pluginPromise from 'eslint-plugin-promise';
+import prettierPlugin from 'eslint-plugin-prettier/recommended';
+import prettierConfig from 'eslint-config-prettier';
 
-export default tseslint.config(
-  { ignores: ["dist"] },
+export default [
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  pluginPromise.configs['flat/recommended'],
+  prettierPlugin,
+  prettierConfig,
+
   {
-    extends: [
-      ...tseslint.configs.strictTypeChecked,
-      ...tseslint.configs.stylisticTypeChecked,
-      eslintConfigReact.configs.flat.recommended,
-      eslintConfigPrettier,
-    ],
-    files: ["**/*.{ts,tsx}"],
+    ignores: ['dist', '.eslintcache'],
+  },
+
+  {
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
+      globals: { browser: true, worker: true, es2020: true },
+      parser: tseslintparser,
       parserOptions: {
-        project: "./tsconfig.json",
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-    settings: {
-      react: {
-        version: "detect",
+        ecmaVersion: 2020, // Allows for the parsing of modern ECMAScript features
+        sourceType: 'module', // Allows for the use of imports
+        ecmaFeatures: {
+          jsx: true, // Allows for the parsing of JSX
+        },
       },
     },
     plugins: {
-      "react-hooks": reactHooks,
-      "react-refresh": reactRefresh,
+      'unused-imports': unusedImports,
     },
     rules: {
-      ...reactHooks.configs.recommended.rules,
-      "react-refresh/only-export-components": [
-        "warn",
-        { allowConstantExport: true },
-      ],
-      "react/jsx-curly-spacing": [2, "never"],
-      "react/jsx-no-bind": [
-        2,
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
+      'unused-imports/no-unused-imports': 'error',
+      'unused-imports/no-unused-vars': [
+        'warn',
         {
-          allowArrowFunctions: true,
-          allowBind: false,
-          ignoreRefs: true,
+          vars: 'all',
+          varsIgnorePattern: '^_',
+          args: 'after-used',
+          argsIgnorePattern: '^_',
         },
       ],
-      "react/react-in-jsx-scope": "off",
-      "react/jsx-uses-react": "off",
-      "react/jsx-uses-vars": "error",
-      "react/no-danger": "error",
-      "react/no-danger-with-children": "error",
-      "react/no-deprecated": "error",
-      "react/no-did-mount-set-state": "error",
-      "react/no-did-update-set-state": "error",
-      "react/no-direct-mutation-state": "error",
-      "react/no-find-dom-node": "error",
-      "react/no-render-return-value": "error",
-      "react/no-string-refs": "error",
-      "react/no-unescaped-entities": "warn",
-      "react/no-unknown-property": "error",
-      "react/no-unused-prop-types": "error",
-      "react/prefer-es6-class": "error",
-      "react/prefer-stateless-function": "warn",
-      "react/prop-types": 0,
-      "react/require-render-return": "error",
-      "@typescript-eslint/no-unused-vars": ["error"],
-      "react/self-closing-comp": [
-        "error",
-        {
-          component: true,
-          html: true,
-        },
-      ],
-      "react/style-prop-object": "error",
+      '@typescript-eslint/no-explicit-any': 'off',
+      'import/no-default-export': 'off',
+      'no-prototype-builtins': 'off',
+      'promise/no-promise-in-callback': 'off',
+      'prettier/prettier': 'error',
+      'arrow-body-style': 'off',
+      'prefer-arrow-callback': 'off',
     },
-  }
-);
+  },
+];

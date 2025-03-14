@@ -1,10 +1,10 @@
 # @mawns/vite-plugin-eslint
 
-![Static Badge](https://img.shields.io/badge/ESLint-9.x.x-blue)
-![Static Badge](https://img.shields.io/badge/Vite-6.x.x-blue)
+![Static Badge](https://img.shields.io/badge/ESLint-^8.0.0-blue)
+![Static Badge](https://img.shields.io/badge/Vite-^6.0.0-blue)
 ![Static Badge](https://img.shields.io/badge/License-MIT-green)
 
-Plugin to show ESLint output in custom HMR overlay
+Plugin to show ESLint output in custom HMR overlay, (working on typescript)
 
 ## Install
 
@@ -29,40 +29,41 @@ export default defineConfig({
 });
 ```
 
-#### This plugin uses configuration from an existing ESLint flat config file and ESLint should be set up in your project beforehand.
+#### This plugin uses configuration from an existing ESLint config file and ESLint should be set up in your project beforehand.
 
 ## Options
 
 You can pass an options object to the plugin in order to customize some of its behaviour
 
-### useCache
+#### useCache
 
 - Type: `boolean`
 - Default: `true`
 
 Cache previous eslint results to speed up process.
 
-### useConsole
+---
+#### useConsole
 
 - Type: `boolean`
 - Default: `false`
 
 Print output to the console.
 
-### useCustomOverlay
+---
+#### useCustomOverlay
 
 - Type: `boolean`
 - Default: `true`
 
 Print output to the custom HMR overlay.
 
-### showWarnings
+---
+#### showWarnings
 
 - Type: `boolean`
 - Default: `true`
 
 Include eslint Warnings in the output.
 
-## License
-
-MIT
+## License - MIT
