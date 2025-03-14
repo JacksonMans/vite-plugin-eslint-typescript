@@ -1,6 +1,5 @@
 {
   "name": "@mawns/vite-plugin-eslint",
-  "private": true,
   "version": "1.2.0",
   "main": "./dist/plugin.js",
   "module": "./dist/plugin.js",
