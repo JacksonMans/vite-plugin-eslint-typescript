@@ -22,9 +22,6 @@ export interface ViteTypescriptEslintPluginOptions {
 }
 
 export enum OverlayClassNames {
-  header = 'header',
-  content = 'content',
-  footer = 'footer',
   message = 'message',
   messageText = 'message-text',
   error = 'severity-error',
@@ -36,7 +33,6 @@ export enum OverlayClassNames {
 }
 
 export enum OverlayAssets {
-  style = '/@mawns/vite-plugin-eslint/style.css',
   script = '/@mawns/vite-plugin-eslint/script',
   badgeError = '/@mawns/vite-plugin-eslint/badge-error.svg',
   badgeWarning = '/@mawns/vite-plugin-eslint/badge-warning.svg',

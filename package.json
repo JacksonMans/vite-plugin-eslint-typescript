@@ -25,16 +25,18 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint:fix": "eslint --fix .",
+    "knip": "knip --config knip.json"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
-    "@types/node": "^22.13.10",
+    "@types/node": "^22.13.13",
     "eslint": "^9.22.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.3",
     "eslint-plugin-promise": "^7.2.1",
     "eslint-plugin-unused-imports": "^4.1.4",
+    "knip": "^5.46.2",
     "prettier": "^3.5.3",
     "sass": "^1.85.1",
     "typescript": "~5.7.2",
@@ -43,8 +45,8 @@
     "vite-plugin-dts": "^4.5.3"
   },
   "peerDependencies": {
-    "vite": "^6.0.0",
-    "eslint": "^9.0.0"
+    "eslint": "^9.0.0",
+    "vite": "^6.0.0"
   },
   "description": "Vite plugin to display eslint and typescript errors in your app",
   "keywords": [
