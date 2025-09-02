@@ -25,6 +25,7 @@
   display: none;
   align-items: center;
   justify-content: center;
+  z-index: 9999999999;
   &:hover {
     box-shadow: 0 0 15px -5px rgba(22, 129, 93, 0.8);
     cursor: pointer;

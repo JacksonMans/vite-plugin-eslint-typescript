@@ -71,8 +71,8 @@ export const load = () => {
         }
         badge.innerHTML = badgeContent;
         if (o) {
-          outer.setAttribute('style', 'display: none;');
-          badge.setAttribute('style', 'display: flex;');
+          outer.setAttribute('style', 'display: flex;');
+          badge.setAttribute('style', 'display: none;');
           header.innerHTML = `<p>ESLint run resulted in <span class="severity-error">${errors} errors</span> and <span class="severity-warning">${warnings} warnings</span>!</p>`;
         } else {
           outer.setAttribute('style', 'display: none;');
