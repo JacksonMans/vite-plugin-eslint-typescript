@@ -1,6 +1,6 @@
 {
   "name": "@mawns/vite-plugin-eslint",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "main": "./dist/plugin.js",
   "module": "./dist/plugin.js",
   "types": "./dist/plugin.d.ts",
@@ -27,7 +27,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "knip": "knip --config knip.json",
-    "depcheck": "depcheck ."
+    "depcheck": "depcheck .",
+    "prepublishOnly": "npm run build",
+    "pub": "npm publish"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -47,8 +49,11 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
-    "eslint": "^9.0.0",
-    "vite": "^7.1.2"
+    "eslint": ">=9.0.0",
+    "vite": "^7.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "description": "Vite plugin to display eslint and typescript errors in your app",
   "keywords": [
