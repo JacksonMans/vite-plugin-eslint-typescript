@@ -1,27 +1,86 @@
 import { ESLint } from 'eslint';
-import { PluginOption } from 'vite';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { Worker } from 'worker_threads';
+import type { PluginOption } from 'vite';
 
 import { defaultOptions } from './constants';
-import { formatEslintForCustomOverlay } from './formatters';
+import {
+  formatEslintForCustomOverlay,
+  formatTypescriptForConsole,
+  formatTypescriptForCustomOverlay,
+} from './formatters';
 import {
   OverlayAssets,
   OverlayEvents,
+  TypescriptDiagnostic,
   ViteTypescriptEslintPluginOptions,
 } from './types';
 
 export const viteEslintPlugin = (
   userOptions?: ViteTypescriptEslintPluginOptions,
-): PluginOption => {
-  const { useCache, useConsole, showWarnings, useCustomOverlay } = {
+) => {
+  const {
+    useCache,
+    useConsole,
+    showWarnings,
+    useCustomOverlay,
+    useTypeScript,
+  } = {
     ...defaultOptions,
     ...userOptions,
   };
 
-  const linter = new ESLint({
-    cache: useCache,
-    warnIgnored: !showWarnings,
-  });
+  const eslintPattern = ['**/*.{ts,tsx,js,jsx}'];
+  const linter = new ESLint({ cache: useCache });
   let prevTimeStamp = 0;
+  let tsWorker: Worker | null = null;
+  let cachedOverlayHtml: string | null = null;
+  let cachedConsoleOutput: string | null = null;
+  let lastLoggedEslintOutput: string | null = null;
+  let lastLoggedTsOutput: string | null = null;
+  let initialRunStarted = false;
+  let eslintRunning = false;
+
+  function filterWarnings(results: ESLint.LintResult[]): ESLint.LintResult[] {
+    if (showWarnings) return results;
+    return results.map((r) => ({
+      ...r,
+      messages: r.messages.filter((m) => m.severity === 2),
+      warningCount: 0,
+      fixableWarningCount: 0,
+    }));
+  }
+
+  async function runEslint() {
+    if (eslintRunning) return;
+    eslintRunning = true;
+    try {
+      const results = filterWarnings(await linter.lintFiles(eslintPattern));
+
+      if (useConsole) {
+        const formatter = await linter.loadFormatter('stylish');
+        cachedConsoleOutput = await formatter.format(results);
+      }
+
+      if (useCustomOverlay) {
+        cachedOverlayHtml = formatEslintForCustomOverlay(results);
+      }
+    } finally {
+      eslintRunning = false;
+    }
+  }
+
+  function logEslintToConsole() {
+    if (
+      useConsole &&
+      cachedConsoleOutput &&
+      cachedConsoleOutput !== lastLoggedEslintOutput
+    ) {
+      lastLoggedEslintOutput = cachedConsoleOutput;
+      console.log(cachedConsoleOutput);
+    }
+  }
 
   return {
     name: '@mawns/vite-plugin-eslint',
@@ -71,30 +130,89 @@ export const viteEslintPlugin = (
       },
     },
     configureServer: async (server) => {
-      server.ws.on(OverlayEvents.connected, async () => {
+      if (useTypeScript) {
         try {
-          const results = await linter.lintFiles(['**/*.{ts,tsx,js,jsx}']);
+          const pluginDir = path.dirname(fileURLToPath(import.meta.url));
+          const workerPath = path.join(pluginDir, 'typescript-worker.js');
+          tsWorker = new Worker(workerPath, {
+            workerData: { cwd: server.config.root },
+          });
 
-          if (useConsole) {
-            const formatter = await linter.loadFormatter('stylish');
-            const consoleFormat = await formatter.format(results);
-            if (consoleFormat) {
-              console.log(consoleFormat);
-            }
-          }
+          tsWorker.on(
+            'message',
+            (msg: {
+              type: string;
+              diagnostics?: TypescriptDiagnostic[];
+              message?: string;
+            }) => {
+              if (msg.type === 'result' && msg.diagnostics) {
+                if (useConsole) {
+                  const output = formatTypescriptForConsole(msg.diagnostics);
+                  if (output && output !== lastLoggedTsOutput) {
+                    lastLoggedTsOutput = output;
+                    console.log(output);
+                  }
+                }
+                if (useCustomOverlay) {
+                  server.ws.send({
+                    type: 'custom',
+                    event: OverlayEvents.typescript,
+                    data: formatTypescriptForCustomOverlay(msg.diagnostics),
+                  });
+                }
+              } else if (msg.type === 'error') {
+                console.warn(
+                  `[@mawns/vite-plugin-eslint] ${msg.message}`,
+                );
+                tsWorker?.terminate();
+                tsWorker = null;
+              }
+            },
+          );
 
-          if (useCustomOverlay) {
-            const customFormat = formatEslintForCustomOverlay(results);
+          tsWorker.on('error', (err: Error) => {
+            console.warn(
+              `[@mawns/vite-plugin-eslint] TypeScript checking disabled: ${err.message}`,
+            );
+            tsWorker = null;
+          });
 
-            server.ws.send({
-              type: 'custom',
-              event: OverlayEvents.lint,
-              data: customFormat,
-            });
-          }
-        } catch (error) {
-          console.error('ESLint error:', error);
+          server.httpServer?.on('close', () => {
+            tsWorker?.terminate();
+            tsWorker = null;
+          });
+        } catch {
+          console.warn(
+            '[@mawns/vite-plugin-eslint] Failed to start TypeScript worker',
+          );
         }
+      }
+
+      function sendEslintToOverlay() {
+        if (useCustomOverlay && cachedOverlayHtml !== null) {
+          server.ws.send({
+            type: 'custom',
+            event: OverlayEvents.lint,
+            data: cachedOverlayHtml,
+          });
+        }
+      }
+
+      server.ws.on(OverlayEvents.connected, async () => {
+        if (cachedOverlayHtml !== null) {
+          sendEslintToOverlay();
+        } else if (!initialRunStarted) {
+          initialRunStarted = true;
+          try {
+            await runEslint();
+            logEslintToConsole();
+            sendEslintToOverlay();
+          } catch (error) {
+            console.error('ESLint error:', error);
+          }
+        }
+
+        tsWorker?.postMessage({ type: 'getResult' });
       });
     },
 
@@ -105,30 +223,22 @@ export const viteEslintPlugin = (
         }
         prevTimeStamp = ctx.timestamp;
 
-        const eslintResults = await linter.lintFiles('*/**/*');
+        await runEslint();
+        logEslintToConsole();
 
-        if (useConsole) {
-          const formatter = await linter.loadFormatter('stylish');
-          const consoleFormat = await formatter.format(eslintResults);
-          if (consoleFormat) {
-            console.log(consoleFormat);
-          }
-        }
-
-        if (useCustomOverlay) {
-          const customFormat = formatEslintForCustomOverlay(eslintResults);
-
+        if (useCustomOverlay && cachedOverlayHtml !== null) {
           ctx.server.ws.send({
             type: 'custom',
             event: OverlayEvents.lint,
-            data: customFormat,
+            data: cachedOverlayHtml,
           });
         }
       } catch (error) {
         console.error('ESLint error:', error);
       }
     },
-  };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } satisfies PluginOption as any;
 };
 
 export default viteEslintPlugin;
