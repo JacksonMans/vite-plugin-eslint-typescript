@@ -12,6 +12,7 @@ export default defineConfig({
       entry: {
         plugin: './src/plugin/plugin.ts',
         script: './src/plugin/script.ts',
+        'typescript-worker': './src/plugin/typescript-worker.ts',
       },
       formats: ['es'],
     },
@@ -19,7 +20,15 @@ export default defineConfig({
     minify: 'esbuild',
     outDir: 'dist',
     rollupOptions: {
-      external: ['sass', 'eslint'],
+      external: [
+          'sass',
+          'eslint',
+          'typescript',
+          'worker_threads',
+          'path',
+          'url',
+          'fs',
+        ],
       output: {
         format: 'es',
         interop: 'auto',
@@ -48,7 +57,7 @@ export default defineConfig({
       },
     },
     {
-      name: 'update-imports',
+      name: 'rewrite-script-import',
       enforce: 'pre',
       apply: 'build',
       transform(code, id) {
