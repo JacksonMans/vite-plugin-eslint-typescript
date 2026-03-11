@@ -51,6 +51,41 @@ export const load = () => {
     }
   });
 
+  let eslintHtml = '';
+  let typescriptHtml = '';
+
+  function render() {
+    let combined = '';
+    if (typescriptHtml) {
+      combined += `<div class="section"><div class="section-label">TypeScript</div>${typescriptHtml}</div>`;
+    }
+    if (eslintHtml) {
+      combined += `<div class="section"><div class="section-label">ESLint</div>${eslintHtml}</div>`;
+    }
+    content.innerHTML = combined;
+
+    const errors = combined.match(/class="severity-error"/g)?.length || 0;
+    const warnings = combined.match(/class="severity-warning"/g)?.length || 0;
+
+    let badgeContent = '';
+    if (errors > 0) {
+      badgeContent += `<img class="badge-error" src="${badgeError}" alt="errors"> ${errors}`;
+    }
+    if (warnings > 0) {
+      badgeContent += `<img class="badge-warning" src="${badgeWarning}" alt="warnings"> ${warnings}`;
+    }
+    badge.innerHTML = badgeContent;
+
+    if (combined) {
+      outer.setAttribute('style', 'display: flex;');
+      badge.setAttribute('style', 'display: none;');
+      header.innerHTML = `<p><span class="severity-error">${errors} errors</span> and <span class="severity-warning">${warnings} warnings</span></p>`;
+    } else {
+      outer.setAttribute('style', 'display: none;');
+      badge.setAttribute('style', 'display: none;');
+    }
+  }
+
   const connect = () => {
     if (import.meta.hot) {
       import.meta.hot.on(OverlayEvents.styleUpdate, (cssContent) => {
@@ -59,25 +94,12 @@ export const load = () => {
     }
     if (import.meta.env.DEV && import.meta.hot) {
       import.meta.hot.on(OverlayEvents.lint, (o) => {
-        content.innerHTML = o;
-        const errors = o.match(/class="severity-error"/g)?.length || 0;
-        const warnings = o.match(/class="severity-warning"/g)?.length || 0;
-        let badgeContent = '';
-        if (errors > 0) {
-          badgeContent += `<img class="badge-error" src="${badgeError}" alt="errors"> ${errors}`;
-        }
-        if (warnings > 0) {
-          badgeContent += `<img class="badge-warning" src="${badgeWarning}" alt="warnings"> ${warnings}`;
-        }
-        badge.innerHTML = badgeContent;
-        if (o) {
-          outer.setAttribute('style', 'display: flex;');
-          badge.setAttribute('style', 'display: none;');
-          header.innerHTML = `<p>ESLint run resulted in <span class="severity-error">${errors} errors</span> and <span class="severity-warning">${warnings} warnings</span>!</p>`;
-        } else {
-          outer.setAttribute('style', 'display: none;');
-          badge.setAttribute('style', 'display: none;');
-        }
+        eslintHtml = o;
+        render();
+      });
+      import.meta.hot.on(OverlayEvents.typescript, (o) => {
+        typescriptHtml = o;
+        render();
       });
       import.meta.hot.send(OverlayEvents.connected);
     } else {
