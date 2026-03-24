@@ -237,7 +237,6 @@ export const viteEslintPlugin = (
         console.error('ESLint error:', error);
       }
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } satisfies PluginOption as any;
 };
 

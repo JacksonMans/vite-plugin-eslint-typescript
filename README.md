@@ -1,7 +1,7 @@
 # @mawns/vite-plugin-eslint
 
 ![Static Badge](https://img.shields.io/badge/ESLint->=9.0.0-blue)
-![Static Badge](https://img.shields.io/badge/Vite-^7.0.0-blue)
+![Static Badge](https://img.shields.io/badge/Vite->=7.0.0-blue)
 ![Static Badge](https://img.shields.io/badge/TypeScript->=5.0.0_(optional)-blue)
 ![Static Badge](https://img.shields.io/badge/License-MIT-green)
 
