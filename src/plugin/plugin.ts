@@ -1,4 +1,3 @@
-import { ESLint } from 'eslint';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { Worker } from 'worker_threads';
@@ -6,7 +5,6 @@ import type { PluginOption } from 'vite';
 
 import { defaultOptions } from './constants';
 import {
-  formatEslintForCustomOverlay,
   formatTypescriptForConsole,
   formatTypescriptForCustomOverlay,
 } from './formatters';
@@ -16,6 +14,7 @@ import {
   TypescriptDiagnostic,
   ViteTypescriptEslintPluginOptions,
 } from './types';
+import { sendFixPrompt } from './acp-client';
 
 export const viteEslintPlugin = (
   userOptions?: ViteTypescriptEslintPluginOptions,
@@ -26,61 +25,16 @@ export const viteEslintPlugin = (
     showWarnings,
     useCustomOverlay,
     useTypeScript,
+    cursorMode,
   } = {
     ...defaultOptions,
     ...userOptions,
   };
 
-  const eslintPattern = ['**/*.{ts,tsx,js,jsx}'];
-  const linter = new ESLint({ cache: useCache });
-  let prevTimeStamp = 0;
   let tsWorker: Worker | null = null;
-  let cachedOverlayHtml: string | null = null;
-  let cachedConsoleOutput: string | null = null;
-  let lastLoggedEslintOutput: string | null = null;
+  let eslintWorker: Worker | null = null;
   let lastLoggedTsOutput: string | null = null;
-  let initialRunStarted = false;
-  let eslintRunning = false;
-
-  function filterWarnings(results: ESLint.LintResult[]): ESLint.LintResult[] {
-    if (showWarnings) return results;
-    return results.map((r) => ({
-      ...r,
-      messages: r.messages.filter((m) => m.severity === 2),
-      warningCount: 0,
-      fixableWarningCount: 0,
-    }));
-  }
-
-  async function runEslint() {
-    if (eslintRunning) return;
-    eslintRunning = true;
-    try {
-      const results = filterWarnings(await linter.lintFiles(eslintPattern));
-
-      if (useConsole) {
-        const formatter = await linter.loadFormatter('stylish');
-        cachedConsoleOutput = await formatter.format(results);
-      }
-
-      if (useCustomOverlay) {
-        cachedOverlayHtml = formatEslintForCustomOverlay(results);
-      }
-    } finally {
-      eslintRunning = false;
-    }
-  }
-
-  function logEslintToConsole() {
-    if (
-      useConsole &&
-      cachedConsoleOutput &&
-      cachedConsoleOutput !== lastLoggedEslintOutput
-    ) {
-      lastLoggedEslintOutput = cachedConsoleOutput;
-      console.log(cachedConsoleOutput);
-    }
-  }
+  let lastLoggedEslintOutput: string | null = null;
 
   return {
     name: 'vite-plugin-eslint-typescript',
@@ -119,7 +73,7 @@ export const viteEslintPlugin = (
             },
             children: `
               import { load } from "${OverlayAssets.script}";
-              load();
+              load(${JSON.stringify({ cursorMode })});
               `,
           },
           {
@@ -130,9 +84,11 @@ export const viteEslintPlugin = (
       },
     },
     configureServer: async (server) => {
+      const pluginDir = path.dirname(fileURLToPath(import.meta.url));
+
+      // --- TypeScript worker ---
       if (useTypeScript) {
         try {
-          const pluginDir = path.dirname(fileURLToPath(import.meta.url));
           const workerPath = path.join(pluginDir, 'typescript-worker.js');
           tsWorker = new Worker(workerPath, {
             workerData: { cwd: server.config.root },
@@ -176,11 +132,6 @@ export const viteEslintPlugin = (
             );
             tsWorker = null;
           });
-
-          server.httpServer?.on('close', () => {
-            tsWorker?.terminate();
-            tsWorker = null;
-          });
         } catch {
           console.warn(
             '[vite-plugin-eslint-typescript] Failed to start TypeScript worker',
@@ -188,53 +139,104 @@ export const viteEslintPlugin = (
         }
       }
 
-      function sendEslintToOverlay() {
-        if (useCustomOverlay && cachedOverlayHtml !== null) {
-          server.ws.send({
-            type: 'custom',
-            event: OverlayEvents.lint,
-            data: cachedOverlayHtml,
-          });
-        }
+      // --- ESLint worker ---
+      try {
+        const workerPath = path.join(pluginDir, 'eslint-worker.js');
+        eslintWorker = new Worker(workerPath, {
+          workerData: {
+            cwd: server.config.root,
+            useCache,
+            showWarnings,
+          },
+        });
+
+        eslintWorker.on(
+          'message',
+          (msg: {
+            type: string;
+            overlayHtml?: string;
+            consoleOutput?: string;
+            message?: string;
+          }) => {
+            if (msg.type === 'result') {
+              if (useConsole && msg.consoleOutput) {
+                if (msg.consoleOutput !== lastLoggedEslintOutput) {
+                  lastLoggedEslintOutput = msg.consoleOutput;
+                  console.log(msg.consoleOutput);
+                }
+              }
+              if (useCustomOverlay) {
+                server.ws.send({
+                  type: 'custom',
+                  event: OverlayEvents.lint,
+                  data: msg.overlayHtml ?? '',
+                });
+              }
+            } else if (msg.type === 'error') {
+              console.warn(
+                `[vite-plugin-eslint-typescript] ESLint worker: ${msg.message}`,
+              );
+            }
+          },
+        );
+
+        eslintWorker.on('error', (err: Error) => {
+          console.warn(
+            `[vite-plugin-eslint-typescript] ESLint worker failed: ${err.message}`,
+          );
+          eslintWorker = null;
+        });
+      } catch {
+        console.warn(
+          '[vite-plugin-eslint-typescript] Failed to start ESLint worker',
+        );
       }
 
-      server.ws.on(OverlayEvents.connected, async () => {
-        if (cachedOverlayHtml !== null) {
-          sendEslintToOverlay();
-        } else if (!initialRunStarted) {
-          initialRunStarted = true;
-          try {
-            await runEslint();
-            logEslintToConsole();
-            sendEslintToOverlay();
-          } catch (error) {
-            console.error('ESLint error:', error);
-          }
-        }
+      // --- Cleanup on server close ---
+      server.httpServer?.on('close', () => {
+        tsWorker?.terminate();
+        tsWorker = null;
+        eslintWorker?.terminate();
+        eslintWorker = null;
+      });
 
+      // --- Overlay connected: send cached results ---
+      server.ws.on(OverlayEvents.connected, () => {
+        eslintWorker?.postMessage({ type: 'getResult' });
         tsWorker?.postMessage({ type: 'getResult' });
       });
-    },
 
-    handleHotUpdate: async (ctx) => {
-      try {
-        if (ctx.timestamp - prevTimeStamp < 1000) {
-          return;
-        }
-        prevTimeStamp = ctx.timestamp;
+      // --- ACP fix request ---
+      server.ws.on(OverlayEvents.fixRequest, async (diagnosticText: string) => {
+        if (cursorMode !== 'acp') return;
 
-        await runEslint();
-        logEslintToConsole();
-
-        if (useCustomOverlay && cachedOverlayHtml !== null) {
-          ctx.server.ws.send({
+        const sendStatus = (status: string, detail?: string) => {
+          server.ws.send({
             type: 'custom',
-            event: OverlayEvents.lint,
-            data: cachedOverlayHtml,
+            event: OverlayEvents.fixStatus,
+            data: detail ? `${status}:${detail}` : status,
           });
+        };
+
+        const prompt = `Fix the following ESLint and TypeScript errors:\n\n${diagnosticText}`;
+
+        const result = await sendFixPrompt(
+          server.config.root,
+          prompt,
+          sendStatus,
+        );
+
+        if (!result.success) {
+          console.warn(`[vite-plugin-eslint-typescript] ACP fix failed: ${result.error}`);
         }
-      } catch (error) {
-        console.error('ESLint error:', error);
+
+        sendStatus(result.success ? 'done' : `error:${result.error}`);
+      });
+    },
+    handleHotUpdate({ file }) {
+      const lintable = /\.(ts|tsx|js|jsx)$/.test(file);
+      if (lintable && eslintWorker) {
+        eslintWorker.postMessage({ type: 'fileChanged' });
       }
     },
   } satisfies PluginOption as any;
