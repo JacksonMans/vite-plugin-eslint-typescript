@@ -3,15 +3,15 @@
   "version": "1.0.0",
   "main": "./dist/plugin.js",
   "module": "./dist/plugin.js",
-  "types": "./dist/plugin.d.ts",
+  "types": "./dist/src/plugin/plugin.d.ts",
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/plugin.d.ts",
+      "types": "./dist/src/plugin/plugin.d.ts",
       "import": "./dist/plugin.js"
     },
     "./script": {
-      "types": "./dist/script.d.ts",
+      "types": "./dist/src/plugin/script.d.ts",
       "import": "./dist/script.js"
     },
     "./typescript-worker": {
@@ -37,7 +37,7 @@
     "@types/node": "^25.2.3",
     "depcheck": "^1.4.7",
     "esbuild": "^0.27.4",
-    "eslint": "^10.0.0",
+    "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "knip": "^6.0.4",
