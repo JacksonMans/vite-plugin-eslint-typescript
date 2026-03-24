@@ -83,7 +83,7 @@ export const viteEslintPlugin = (
   }
 
   return {
-    name: '@mawns/vite-plugin-eslint',
+    name: 'vite-plugin-eslint-typescript',
     resolveId(id) {
       if (id === OverlayAssets.script) {
         return id;
@@ -162,7 +162,7 @@ export const viteEslintPlugin = (
                 }
               } else if (msg.type === 'error') {
                 console.warn(
-                  `[@mawns/vite-plugin-eslint] ${msg.message}`,
+                  `[vite-plugin-eslint-typescript] ${msg.message}`,
                 );
                 tsWorker?.terminate();
                 tsWorker = null;
@@ -172,7 +172,7 @@ export const viteEslintPlugin = (
 
           tsWorker.on('error', (err: Error) => {
             console.warn(
-              `[@mawns/vite-plugin-eslint] TypeScript checking disabled: ${err.message}`,
+              `[vite-plugin-eslint-typescript] TypeScript checking disabled: ${err.message}`,
             );
             tsWorker = null;
           });
@@ -183,7 +183,7 @@ export const viteEslintPlugin = (
           });
         } catch {
           console.warn(
-            '[@mawns/vite-plugin-eslint] Failed to start TypeScript worker',
+            '[vite-plugin-eslint-typescript] Failed to start TypeScript worker',
           );
         }
       }

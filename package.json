@@ -1,6 +1,6 @@
 {
-  "name": "@mawns/vite-plugin-eslint",
-  "version": "1.4.1",
+  "name": "vite-plugin-eslint-typescript",
+  "version": "1.0.0",
   "main": "./dist/plugin.js",
   "module": "./dist/plugin.js",
   "types": "./dist/plugin.d.ts",
@@ -62,17 +62,24 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JacksonMans/vite-plugin-eslint.git"
+    "url": "git+https://github.com/JacksonMans/vite-plugin-eslint-typescript.git"
   },
-  "publishConfig": {
-    "access": "public"
-  },
-  "description": "Vite plugin to display eslint and typescript errors in your app",
+  "description": "Vite plugin that runs ESLint and TypeScript type-checking during development with an in-browser error overlay",
   "keywords": [
+    "vite",
+    "vite-plugin",
     "eslint",
     "typescript",
-    "vite",
-    "plugin"
+    "linter",
+    "lint",
+    "type-check",
+    "type-checking",
+    "overlay",
+    "hmr",
+    "dx",
+    "developer-experience",
+    "diagnostics",
+    "errors"
   ],
   "author": "mawns",
   "license": "MIT"

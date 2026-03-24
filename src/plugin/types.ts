@@ -48,14 +48,14 @@ export enum OverlayClassNames {
 }
 
 export enum OverlayAssets {
-  script = '/@mawns/vite-plugin-eslint/script',
-  badgeError = '/@mawns/vite-plugin-eslint/badge-error.svg',
-  badgeWarning = '/@mawns/vite-plugin-eslint/badge-warning.svg',
+  script = '/vite-plugin-eslint-typescript/script',
+  badgeError = '/vite-plugin-eslint-typescript/badge-error.svg',
+  badgeWarning = '/vite-plugin-eslint-typescript/badge-warning.svg',
 }
 
 export enum OverlayEvents {
-  connected = '@mawns/vite-plugin-eslint:connected',
-  lint = '@mawns/vite-plugin-eslint:lint',
-  typescript = '@mawns/vite-plugin-eslint:typescript',
-  styleUpdate = '@mawns/vite-plugin-eslint:style-update',
+  connected = 'vite-plugin-eslint-typescript:connected',
+  lint = 'vite-plugin-eslint-typescript:lint',
+  typescript = 'vite-plugin-eslint-typescript:typescript',
+  styleUpdate = 'vite-plugin-eslint-typescript:style-update',
 }

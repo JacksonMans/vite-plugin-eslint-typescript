@@ -63,7 +63,7 @@ export default defineConfig({
         if (id.endsWith('plugin.ts')) {
           return code.replaceAll(
             `/src/plugin/script`,
-            '@mawns/vite-plugin-eslint/script',
+            'vite-plugin-eslint-typescript/script',
           );
         }
       },

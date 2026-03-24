@@ -1,4 +1,4 @@
-# @mawns/vite-plugin-eslint
+# vite-plugin-eslint-typescript
 
 ![Static Badge](https://img.shields.io/badge/ESLint->=9.0.0-blue)
 ![Static Badge](https://img.shields.io/badge/Vite->=7.0.0-blue)
@@ -12,9 +12,9 @@ TypeScript checking runs in a **background worker thread** using the TypeScript 
 ## Install
 
 ```
-npm install @mawns/vite-plugin-eslint -D
+npm install vite-plugin-eslint-typescript -D
 # or
-yarn add @mawns/vite-plugin-eslint -D
+yarn add vite-plugin-eslint-typescript -D
 ```
 
 ## Prerequisites
@@ -26,7 +26,7 @@ yarn add @mawns/vite-plugin-eslint -D
 
 ```ts
 import { defineConfig } from 'vite';
-import eslint from '@mawns/vite-plugin-eslint';
+import eslint from 'vite-plugin-eslint-typescript';
 
 export default defineConfig({
   plugins: [
