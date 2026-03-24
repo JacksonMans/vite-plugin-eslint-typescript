@@ -6,4 +6,5 @@ export const defaultOptions: ViteTypescriptEslintPluginOptions = {
   useCustomOverlay: true,
   showWarnings: true,
   useTypeScript: true,
+  cursorMode: 'deeplink',
 };

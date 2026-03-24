@@ -25,6 +25,13 @@ export interface ViteTypescriptEslintPluginOptions {
    * default: true
    */
   useTypeScript?: boolean;
+  /** How the "Fix in Cursor" button behaves.
+   * - 'deeplink': opens Cursor UI with a pre-filled prompt (user confirms)
+   * - 'acp': spawns a headless Cursor agent that auto-fixes without confirmation
+   *
+   * default: 'deeplink'
+   */
+  cursorMode?: 'deeplink' | 'acp';
 }
 
 export interface TypescriptDiagnostic {
@@ -58,4 +65,6 @@ export enum OverlayEvents {
   lint = 'vite-plugin-eslint-typescript:lint',
   typescript = 'vite-plugin-eslint-typescript:typescript',
   styleUpdate = 'vite-plugin-eslint-typescript:style-update',
+  fixRequest = 'vite-plugin-eslint-typescript:fix-request',
+  fixStatus = 'vite-plugin-eslint-typescript:fix-status',
 }
