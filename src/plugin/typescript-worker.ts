@@ -99,7 +99,7 @@ async function main() {
   function startWatchProgram(configPath: string) {
     const host = ts.createWatchCompilerHost(
       configPath,
-      { noEmit: true },
+      { noEmit: true, incremental: true },
       ts.sys,
       ts.createSemanticDiagnosticsBuilderProgram,
       () => {},

@@ -16,6 +16,9 @@
     },
     "./typescript-worker": {
       "import": "./dist/typescript-worker.js"
+    },
+    "./eslint-worker": {
+      "import": "./dist/eslint-worker.js"
     }
   },
   "files": [
@@ -64,7 +67,7 @@
     "type": "git",
     "url": "git+https://github.com/JacksonMans/vite-plugin-eslint-typescript.git"
   },
-  "description": "Vite plugin that runs ESLint and TypeScript type-checking during development with an in-browser error overlay",
+  "description": "Vite plugin that runs ESLint and TypeScript type-checking in background workers with an in-browser error overlay, clickable file paths, and AI-powered auto-fix via Cursor",
   "keywords": [
     "vite",
     "vite-plugin",
@@ -79,7 +82,15 @@
     "dx",
     "developer-experience",
     "diagnostics",
-    "errors"
+    "errors",
+    "cursor",
+    "vscode",
+    "ai-fix",
+    "acp",
+    "auto-fix",
+    "worker-thread",
+    "incremental",
+    "clickable-errors"
   ],
   "author": "mawns",
   "license": "MIT"
