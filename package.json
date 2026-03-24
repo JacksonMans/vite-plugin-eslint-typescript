@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-eslint-typescript",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "./dist/plugin.js",
   "module": "./dist/plugin.js",
   "types": "./dist/src/plugin/plugin.d.ts",
