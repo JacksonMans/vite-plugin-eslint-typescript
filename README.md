@@ -39,7 +39,6 @@ export default defineConfig({
 
 ```ts
 eslint({
-  useCache: true,
   useConsole: false,
   useCustomOverlay: true,
   showWarnings: true,
@@ -50,15 +49,6 @@ eslint({
 ```
 
 ## Options
-
-### useCache
-
-- Type: `boolean`
-- Default: `true`
-
-Use ESLint's built-in caching to speed up subsequent lint runs.
-
----
 
 ### useConsole
 
@@ -132,6 +122,14 @@ ACP mode requires the [Cursor Agent CLI](https://docs.cursor.com/agent/acp) to b
 - The **overlay** displays ESLint and TypeScript results in separate labeled sections with a combined error/warning badge. File paths and line numbers are clickable — they open the file in your editor at the exact error position.
 - The **Fix in Cursor** button appears when errors are present. In deeplink mode it opens Cursor with a prompt; in ACP mode it spawns a headless agent and streams its progress live in the overlay.
 - Projects using TypeScript **project references** (`tsconfig.json` with `references`) are fully supported — the worker creates a watch program per referenced config.
+
+## Caching
+
+Both ESLint and TypeScript use caching to keep subsequent runs fast.
+
+**ESLint** — The ESLint worker always enables the built-in file cache (`.eslintcache`) with `cacheStrategy: 'content'`. This hashes actual file content rather than relying on filesystem modification times, which eliminates a race condition where files modified during a lint run could corrupt mtime-based cache entries. Only files whose content has changed since the last run are re-linted.
+
+**TypeScript** — The TypeScript worker uses `ts.createWatchProgram` with `incremental: true`, which persists a `.tsbuildinfo` file between runs. On cold start the compiler reads this file to skip re-analyzing unchanged files. During the session, the watch program keeps its program state in memory and incrementally re-checks only files affected by each change.
 
 ## License
 

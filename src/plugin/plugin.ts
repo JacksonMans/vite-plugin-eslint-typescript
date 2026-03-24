@@ -20,7 +20,6 @@ export const viteEslintPlugin = (
   userOptions?: ViteTypescriptEslintPluginOptions,
 ) => {
   const {
-    useCache,
     useConsole,
     showWarnings,
     useCustomOverlay,
@@ -146,7 +145,6 @@ export const viteEslintPlugin = (
         eslintWorker = new Worker(workerPath, {
           workerData: {
             cwd: server.config.root,
-            useCache,
             showWarnings,
           },
         });

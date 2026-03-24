@@ -1,9 +1,4 @@
 export interface ViteTypescriptEslintPluginOptions {
-  /** Whether or not to use eslints caching option
-   *
-   * default: true
-   */
-  useCache?: boolean;
   /** Whether or not the plugin should log results to the console
    *
    * default: false

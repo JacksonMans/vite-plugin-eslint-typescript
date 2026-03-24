@@ -3,7 +3,6 @@ import { ESLint, Linter } from 'eslint';
 
 interface WorkerConfig {
   cwd: string;
-  useCache: boolean;
   showWarnings: boolean;
 }
 
@@ -37,9 +36,13 @@ function formatForOverlay(results: ESLint.LintResult[]): string {
 }
 
 async function main() {
-  const { cwd, useCache, showWarnings } = workerData as WorkerConfig;
+  const { cwd, showWarnings } = workerData as WorkerConfig;
 
-  const linter = new ESLint({ cache: useCache, cwd });
+  const linter = new ESLint({
+    cache: true,
+    cacheStrategy: 'content',
+    cwd,
+  });
   const pattern = ['**/*.{ts,tsx,js,jsx}'];
 
   let lastOverlayHtml = '';
