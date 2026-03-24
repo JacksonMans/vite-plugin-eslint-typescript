@@ -31,7 +31,6 @@ export default defineConfig({
         ],
       output: {
         format: 'es',
-        interop: 'auto',
       },
     },
   },
