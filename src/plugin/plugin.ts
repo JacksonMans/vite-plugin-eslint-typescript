@@ -26,6 +26,7 @@ export const viteEslintPlugin = (
     useCustomOverlay,
     useTypeScript,
     cursorMode,
+    editor,
   } = {
     ...defaultOptions,
     ...userOptions,
@@ -73,7 +74,7 @@ export const viteEslintPlugin = (
             },
             children: `
               import { load } from "${OverlayAssets.script}";
-              load(${JSON.stringify({ cursorMode })});
+              load(${JSON.stringify({ cursorMode, editor })});
               `,
           },
           {

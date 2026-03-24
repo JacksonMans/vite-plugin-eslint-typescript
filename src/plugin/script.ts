@@ -4,6 +4,7 @@ import { OverlayEvents } from './types';
 
 interface OverlayConfig {
   cursorMode?: 'deeplink' | 'acp';
+  editor?: string;
 }
 
 const MAX_DEEPLINK_LENGTH = 8000;
@@ -65,6 +66,14 @@ function openDeeplink(diagnosticText: string) {
 
 export const load = (config?: OverlayConfig) => {
   const cursorMode = config?.cursorMode ?? 'deeplink';
+  const editorProtocol = config?.editor ?? 'cursor';
+
+  function openInEditor(filePath: string, line?: string, col?: string) {
+    let url = `${editorProtocol}://file/${filePath}`;
+    if (line) url += `:${line}`;
+    if (line && col) url += `:${col}`;
+    window.open(url, '_blank');
+  }
 
   const overlay = document.querySelector('mawns-vite-plugin-eslint-overlay');
   if (!overlay) return;
@@ -187,6 +196,17 @@ export const load = (config?: OverlayConfig) => {
         badge.setAttribute('style', 'display: none;');
       }
     }
+  });
+
+  content.addEventListener('click', (event: MouseEvent) => {
+    const target = event.target as HTMLElement | null;
+    if (!target) return;
+    const anchor = target.closest('.file-path, .line-details') as HTMLElement | null;
+    if (!anchor) return;
+    event.stopPropagation();
+    const file = anchor.dataset.file;
+    if (!file) return;
+    openInEditor(file, anchor.dataset.line, anchor.dataset.col);
   });
 
   function setFixButtonState(state: 'idle' | 'loading' | 'done' | 'error') {

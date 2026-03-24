@@ -19,14 +19,16 @@ const cls = {
 };
 
 function formatForOverlay(results: ESLint.LintResult[]): string {
-  const fmtMsg = (m: Linter.LintMessage) =>
-    `<p class="${cls.message}"><span class="${cls.lineDetails}">${m.line}:${m.column}</span> <span class="${
+  const fmtMsg = (m: Linter.LintMessage, filePath: string) =>
+    `<p class="${cls.message}"><a class="${cls.lineDetails}" data-file="${filePath}" data-line="${m.line}" data-col="${m.column}">${m.line}:${m.column}</a> <span class="${
       m.severity === 1 ? cls.warning : cls.error
     }">${m.severity === 1 ? 'Warning' : 'Error'} </span>` +
     `<span class="${cls.messageText}">${m.message}</span>  <span class="${cls.ruleId}">${m.ruleId}</span></p>`;
 
-  const fmtResult = (r: ESLint.LintResult) =>
-    `<div class="${cls.lintResult}"><p class="${cls.filePath}">${r.filePath}</p>  ${r.messages.map(fmtMsg).join(' ')}</div>`;
+  const fmtResult = (r: ESLint.LintResult) => {
+    const first = r.messages[0];
+    return `<div class="${cls.lintResult}"><a class="${cls.filePath}" data-file="${r.filePath}" data-line="${first?.line ?? 1}" data-col="${first?.column ?? 1}">${r.filePath}</a>  ${r.messages.map((m) => fmtMsg(m, r.filePath)).join(' ')}</div>`;
+  };
 
   return results
     .filter((r) => r.messages.length)

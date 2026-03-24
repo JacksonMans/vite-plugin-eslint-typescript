@@ -4,10 +4,10 @@ import { OverlayClassNames, TypescriptDiagnostic } from './types';
 export const formatEslintForCustomOverlay = (
   lintResults: ESLint.LintResult[],
 ) => {
-  const formatMessage = (message: Linter.LintMessage) =>
-    `<p class="${OverlayClassNames.message}"><span class="${
+  const formatMessage = (message: Linter.LintMessage, filePath: string) =>
+    `<p class="${OverlayClassNames.message}"><a class="${
       OverlayClassNames.lineDetails
-    }">${message.line}:${message.column}</span> <span class="${
+    }" data-file="${filePath}" data-line="${message.line}" data-col="${message.column}">${message.line}:${message.column}</a> <span class="${
       message.severity === 1
         ? OverlayClassNames.warning
         : OverlayClassNames.error
@@ -18,12 +18,14 @@ export const formatEslintForCustomOverlay = (
       message.ruleId
     }</span></p>`;
 
-  const formatLintResult = (result: ESLint.LintResult) =>
-    `<div class="${OverlayClassNames.lintResult}"><p class="${
+  const formatLintResult = (result: ESLint.LintResult) => {
+    const first = result.messages[0];
+    return `<div class="${OverlayClassNames.lintResult}"><a class="${
       OverlayClassNames.filePath
-    }">${result.filePath}</p>  ${result.messages
-      .map(formatMessage)
+    }" data-file="${result.filePath}" data-line="${first?.line ?? 1}" data-col="${first?.column ?? 1}">${result.filePath}</a>  ${result.messages
+      .map((m) => formatMessage(m, result.filePath))
       .join(' ')}</div>`;
+  };
 
   return lintResults
     .filter((el) => el.messages.length)
@@ -43,15 +45,16 @@ export const formatTypescriptForCustomOverlay = (
 
   return Array.from(byFile.entries())
     .map(
-      ([filePath, diags]) =>
-        `<div class="${OverlayClassNames.lintResult}"><p class="${
+      ([filePath, diags]) => {
+        const first = diags[0];
+        return `<div class="${OverlayClassNames.lintResult}"><a class="${
           OverlayClassNames.filePath
-        }">${filePath}</p> ${diags
+        }" data-file="${filePath}" data-line="${first?.line ?? 1}" data-col="${first?.column ?? 1}">${filePath}</a> ${diags
           .map(
             (d) =>
-              `<p class="${OverlayClassNames.message}"><span class="${
+              `<p class="${OverlayClassNames.message}"><a class="${
                 OverlayClassNames.lineDetails
-              }">${d.line}:${d.column}</span> <span class="${
+              }" data-file="${d.filePath}" data-line="${d.line}" data-col="${d.column}">${d.line}:${d.column}</a> <span class="${
                 d.category === 'error'
                   ? OverlayClassNames.error
                   : OverlayClassNames.warning
@@ -63,7 +66,8 @@ export const formatTypescriptForCustomOverlay = (
                 d.code
               }</span></p>`,
           )
-          .join(' ')}</div>`,
+          .join(' ')}</div>`;
+      },
     )
     .join(' ');
 };

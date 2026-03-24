@@ -148,6 +148,11 @@
       margin-bottom: 0.2rem;
       color: white;
       text-decoration: underline;
+      cursor: pointer;
+      display: block;
+      &:hover {
+        color: rgb(100, 160, 255);
+      }
     }
 
     .severity-warning {
@@ -163,6 +168,12 @@
     .line-details {
       margin-right: 1rem;
       color: #636363;
+      cursor: pointer;
+      text-decoration: none;
+      &:hover {
+        color: rgb(100, 160, 255);
+        text-decoration: underline;
+      }
     }
 
     .message-text {

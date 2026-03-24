@@ -32,6 +32,14 @@ export interface ViteTypescriptEslintPluginOptions {
    * default: 'deeplink'
    */
   cursorMode?: 'deeplink' | 'acp';
+  /** Editor protocol used when clicking file paths in the overlay.
+   * - 'cursor': opens files via cursor://file/...
+   * - 'vscode': opens files via vscode://file/...
+   * - any string: used as-is as the protocol (e.g. 'windsurf')
+   *
+   * default: 'cursor'
+   */
+  editor?: 'cursor' | 'vscode' | string;
 }
 
 export interface TypescriptDiagnostic {

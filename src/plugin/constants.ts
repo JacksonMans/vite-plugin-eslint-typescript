@@ -7,4 +7,5 @@ export const defaultOptions: ViteTypescriptEslintPluginOptions = {
   showWarnings: true,
   useTypeScript: true,
   cursorMode: 'deeplink',
+  editor: 'cursor',
 };
