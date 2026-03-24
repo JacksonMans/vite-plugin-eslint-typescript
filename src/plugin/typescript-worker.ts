@@ -57,7 +57,7 @@ async function main() {
       if (d.file && d.start != null) {
         const pos = ts.getLineAndCharacterOfPosition(d.file, d.start);
         results.push({
-          filePath: path.relative(cwd, d.file.fileName),
+          filePath: d.file.fileName,
           line: pos.line + 1,
           column: pos.character + 1,
           message: ts.flattenDiagnosticMessageText(d.messageText, '\n'),
@@ -78,7 +78,7 @@ async function main() {
         if (d.file && d.start != null) {
           const pos = ts.getLineAndCharacterOfPosition(d.file, d.start);
           results.push({
-            filePath: path.relative(cwd, d.file.fileName),
+            filePath: d.file.fileName,
             line: pos.line + 1,
             column: pos.character + 1,
             message: ts.flattenDiagnosticMessageText(d.messageText, '\n'),
